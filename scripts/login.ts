@@ -1,11 +1,25 @@
 // Client-side login module for Google OAuth (access token flow)
 // Usage: import { initLogin } from './scripts/login.js'; then call initLogin();
 
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        oauth2:{
+          initTokenClient: (config: any) => any;
+        }
+      }
+    };
+    currentUser?: any;
+    game?: any;
+  }
+}
+
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '329569744826-3buqrpvlhqn4ksca7n3go7t3fepd1cpd.apps.googleusercontent.com';
 
-let tokenClient = null;
+let tokenClient: any = null;
 
-function initGoogleScript() {
+function initGoogleScript(): Promise<void> {
     return new Promise((resolve, reject) => {
         if (window.google && window.google.accounts && window.google.accounts.oauth2) return resolve();
         const s = document.createElement('script');
@@ -18,17 +32,17 @@ function initGoogleScript() {
     });
 }
 
-async function ensureTokenClient() {
+async function ensureTokenClient(): Promise<any> {
     if (tokenClient) return tokenClient;
     if (!GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID === 'REPLACE_WITH_YOUR_GOOGLE_CLIENT_ID') {
         console.warn('Please set GOOGLE_CLIENT_ID in environment variables to enable Google login.');
         return null;
     }
     await initGoogleScript();
-    tokenClient = window.google.accounts.oauth2.initTokenClient({
+    tokenClient = window.google!.accounts.oauth2.initTokenClient({
         client_id: GOOGLE_CLIENT_ID,
         scope: 'openid email profile',
-        callback: (resp) => {
+        callback: (resp: any) => {
             if (resp.error) {
                 console.error('Token error', resp);
                 return;
@@ -40,7 +54,7 @@ async function ensureTokenClient() {
     return tokenClient;
 }
 
-async function exchangeTokenWithServer(accessToken) {
+async function exchangeTokenWithServer(accessToken: string): Promise<void> {
     try {
         const res = await fetch('/api/auth/google', {
             method: 'POST',
@@ -65,11 +79,11 @@ async function exchangeTokenWithServer(accessToken) {
         }
     } catch (err) {
         console.error('Auth exchange error', err);
-        alert('Login error: ' + err.message);
+        alert('Login error: ' + (err instanceof Error ? err.message : 'Unknown error'));
     }
 }
 
-function updateUIAfterLogin(user) {
+function updateUIAfterLogin(user: any): void {
     // Replace login button with "Sign out?" text only
     const loginBtn = document.getElementById('loginBtn');
     if (!loginBtn) return;
@@ -86,7 +100,7 @@ function updateUIAfterLogin(user) {
     window.dispatchEvent(event);
 }
 
-function logout() {
+function logout(): void {
     // Clear user data from window and localStorage
     window.currentUser = null;
     localStorage.removeItem('currentUser');
@@ -104,7 +118,7 @@ function logout() {
     window.dispatchEvent(event);
 }
 
-export async function initLogin() {
+export async function initLogin(): Promise<void> {
     const loginBtn = document.getElementById('loginBtn');
     if (!loginBtn) return;
 

@@ -9,9 +9,11 @@ node_modules/
 # Next.js
 /.next/
 /out/
+.next/
 
 # Production
 /build
+dist/
 
 # Misc
 .DS_Store
@@ -21,6 +23,7 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.pnpm-debug.log*
 
 # Local env files
 .env
@@ -28,6 +31,23 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+
+# Project specific
+*.sql
+openai_key.txt
+ai_cache.json
+ai_rate_limits.json
+
+
 
 # IDE
 .vscode/

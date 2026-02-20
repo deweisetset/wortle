@@ -1,7 +1,7 @@
 // Client-side login module for Google OAuth (access token flow)
 // Usage: import { initLogin } from './scripts/login.js'; then call initLogin();
 
-const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '329569744826-3buqrpvlhqn4ksca7n3go7t3fepd1cpd.apps.googleusercontent.com';
+const GOOGLE_CLIENT_ID = '329569744826-3buqrpvlhqn4ksca7n3go7t3fepd1cpd.apps.googleusercontent.com'; // set your client id here
 
 let tokenClient = null;
 

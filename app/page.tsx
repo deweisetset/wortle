@@ -7,7 +7,7 @@ export default function Home() {
     // Dynamically import and initialize the game
     import('@/scripts/wortle-game').then(({ WortleGame, initUIHandlers }) => {
       const game = new WortleGame();
-      window.game = game as any;
+      window.game = game; // langsung pakai, udah typed dari globals.d.ts
       initUIHandlers();
     });
 

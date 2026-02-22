@@ -1,10 +1,13 @@
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+// Import dari node_modules, bukan CDN
+import { createClient } from "@supabase/supabase-js";
 
+// Supabase client
 const supabase = createClient(
   "https://quxxocbuublbbeyrtzmd.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF1eHhvY2J1dWJsYmJleXJ0em1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEwMDQ1NTQsImV4cCI6MjA4NjU4MDU1NH0.yC48vexwUOeOsv1-OU4evr9nWHH72c6Ey4PvojJIf3s"
 );
 
+// Update UI setelah login
 function updateUIAfterLogin(user) {
     const loginBtn = document.getElementById('loginBtn');
     if (!loginBtn) return;
@@ -14,6 +17,7 @@ function updateUIAfterLogin(user) {
     loginBtn.title = user.email || 'Logged in';
 }
 
+// Logout
 async function logout() {
     await supabase.auth.signOut();
 
@@ -25,10 +29,12 @@ async function logout() {
     }
 }
 
+// Inisialisasi login
 export async function initLogin() {
     const loginBtn = document.getElementById('loginBtn');
     if (!loginBtn) return;
 
+    // cek session Supabase
     const { data: { session } } = await supabase.auth.getSession();
 
     if (session?.user) {
@@ -64,6 +70,7 @@ export async function initLogin() {
     });
 }
 
+// Helper untuk load script Google Identity
 function loadScript(src) {
     return new Promise((resolve, reject) => {
         if (document.querySelector("script[src='" + src + "']")) return resolve();
@@ -76,8 +83,9 @@ function loadScript(src) {
     });
 }
 
+// Ambil access token dari Google
 async function getGoogleAccessToken() {
-    const clientId = (window?.NEXT_PUBLIC_GOOGLE_CLIENT_ID) || (typeof process !== 'undefined' && process.env && process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || window.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
     if (!clientId) throw new Error('NEXT_PUBLIC_GOOGLE_CLIENT_ID not set');
 
     await loadScript('https://accounts.google.com/gsi/client');

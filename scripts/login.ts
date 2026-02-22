@@ -39,9 +39,61 @@ export async function initLogin(){
             return;
         }
 
-        await supabase.auth.signInWithOAuth({
-            provider:"google"
+        try {
+            const accessToken = await getGoogleAccessToken();
+
+            const resp = await fetch('/api/auth/google', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ access_token: accessToken })
+            });
+
+            const data = await resp.json();
+
+            if (!resp.ok) throw new Error(data?.error || 'Auth failed');
+
+            updateUIAfterLogin(data.user);
+        } catch (err) {
+            console.error('Login error:', err);
+            alert('Login gagal: ' + String(err));
+        }
+
+    });
+}
+
+async function loadScript(src: string) {
+    return new Promise<void>((resolve, reject) => {
+        if (document.querySelector(`script[src="${src}"]`)) return resolve();
+        const s = document.createElement('script');
+        s.src = src;
+        s.async = true;
+        s.onload = () => resolve();
+        s.onerror = () => reject(new Error('Failed to load ' + src));
+        document.head.appendChild(s);
+    });
+}
+
+async function getGoogleAccessToken(): Promise<string> {
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID as string;
+    if (!clientId) throw new Error('NEXT_PUBLIC_GOOGLE_CLIENT_ID not set');
+
+    await loadScript('https://accounts.google.com/gsi/client');
+
+    return new Promise((resolve, reject) => {
+        const google = (window as any).google;
+        if (!google || !google.accounts || !google.accounts.oauth2) {
+            return reject(new Error('Google Identity library not available'));
+        }
+
+        const tokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: clientId,
+            scope: 'openid email profile',
+            callback: (resp: any) => {
+                if (resp.error) return reject(resp);
+                resolve(resp.access_token);
+            }
         });
 
+        tokenClient.requestAccessToken({ prompt: 'consent' });
     });
 }

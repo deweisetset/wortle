@@ -15,6 +15,14 @@ function updateUIAfterLogin(user) {
     loginBtn.innerHTML = '<span class="login-text">Sign out?</span>';
     loginBtn.classList.add('logged-in');
     loginBtn.title = user.email || 'Logged in';
+    
+    // Store user data di window dan localStorage
+    window.currentUser = user;
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    
+    // Fire event agar UI update
+    const event = new CustomEvent('userLoggedIn', { detail: user });
+    window.dispatchEvent(event);
 }
 
 // Logout
@@ -27,6 +35,14 @@ async function logout() {
         loginBtn.classList.remove('logged-in');
         loginBtn.title = 'Login dengan Google';
     }
+    
+    // Clear user data
+    delete window.currentUser;
+    localStorage.removeItem('currentUser');
+    
+    // Fire event
+    const event = new CustomEvent('userLoggedOut');
+    window.dispatchEvent(event);
 }
 
 // Inisialisasi login
@@ -39,6 +55,18 @@ export async function initLogin() {
 
     if (session?.user) {
         updateUIAfterLogin(session.user);
+    }
+    
+    // Restore dari localStorage jika ada
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+        try {
+            window.currentUser = JSON.parse(savedUser);
+            const event = new CustomEvent('userLoggedIn', { detail: window.currentUser });
+            window.dispatchEvent(event);
+        } catch (e) {
+            console.debug('Failed to restore user from localStorage:', e);
+        }
     }
 
     loginBtn.addEventListener('click', async () => {

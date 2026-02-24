@@ -35,7 +35,7 @@ export class WortleGame {
 
             // Load daftar kata untuk validasi
             try {
-                const response = await fetch('./words5.json');
+                const response = await fetch('/words5.json');
                 if (response.ok) {
                     const wordList = await response.json();
                     // Filter kata 5 huruf untuk validasi
@@ -680,8 +680,15 @@ async function showLeaderboard() {
         const res = await fetch('/api/leaderboard');
         const data = await res.json();
 
-        if (!data.success || !data.leaderboard) {
-            alert('Gagal memuat leaderboard');
+        console.log('Leaderboard response:', data);
+
+        if (!data.success) {
+            alert('Gagal memuat leaderboard: ' + (data.error || 'Unknown error'));
+            return;
+        }
+
+        if (!data.leaderboard || data.leaderboard.length === 0) {
+            alert('Leaderboard masih kosong. Mulai bermain dan menangkan untuk masuk leaderboard!');
             return;
         }
 
@@ -729,12 +736,12 @@ async function showLeaderboard() {
             
             // Player name
             const nameCell = document.createElement('td');
-            nameCell.textContent = player.display_name;
+            nameCell.textContent = player.display_name || 'Unknown';
             nameCell.className = 'name-cell';
             
             // Score
             const scoreCell = document.createElement('td');
-            scoreCell.textContent = player.total_score;
+            scoreCell.textContent = player.total_score || 0;
             scoreCell.className = 'score-cell';
             
             row.appendChild(rankCell);
@@ -761,6 +768,6 @@ async function showLeaderboard() {
         document.body.appendChild(overlay);
     } catch (err) {
         console.error('Leaderboard error:', err);
-        alert('Error loading leaderboard');
+        alert('Error loading leaderboard: ' + String(err));
     }
 }

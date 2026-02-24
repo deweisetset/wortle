@@ -1,5 +1,12 @@
 import { createClient } from "@supabase/supabase-js";
 
+// Declare process.env for TypeScript
+declare const process: {
+  env: {
+    NEXT_PUBLIC_GOOGLE_CLIENT_ID?: string;
+  };
+};
+
 const supabase = createClient(
   "https://quxxocbuublbbeyrtzmd.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF1eHhvY2J1dWJsYmJleXJ0em1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEwMDQ1NTQsImV4cCI6MjA4NjU4MDU1NH0.yC48vexwUOeOsv1-OU4evr9nWHH72c6Ey4PvojJIf3s"
@@ -12,11 +19,45 @@ function updateUIAfterLogin(user:any){
     btn.innerHTML="Sign out?";
     btn.classList.add("logged-in");
     btn.title=user.email;
+    
+    // Store user data di window dan localStorage
+    window.currentUser = user;
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    
+    // Fire event agar UI update
+    const event = new CustomEvent('userLoggedIn', { detail: user });
+    window.dispatchEvent(event);
 }
 
 async function logout(){
     await supabase.auth.signOut();
-    location.reload();
+    
+    const btn=document.getElementById("loginBtn");
+    if(btn) {
+        btn.innerHTML="Login";
+        btn.classList.remove("logged-in");
+        btn.title="Login dengan Google";
+    }
+    
+    // Clear user data
+    delete (window as any).currentUser;
+    localStorage.removeItem('currentUser');
+    
+    // Fire event
+    
+    // Restore dari localStorage jika ada
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+        try {
+            (window as any).currentUser = JSON.parse(savedUser);
+            const event = new CustomEvent('userLoggedIn', { detail: (window as any).currentUser });
+            window.dispatchEvent(event);
+        } catch (e) {
+            console.debug('Failed to restore user from localStorage:', e);
+        }
+    }
+    const event = new CustomEvent('userLoggedOut');
+    window.dispatchEvent(event);
 }
 
 export async function initLogin(){

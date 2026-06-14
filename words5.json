@@ -23,7 +23,6 @@
   {"de":"denke","id":"berpikir"},,
   {"de":"dinos","id":"dinosaurus"},
   {"de":"druse","id":"mineral"},
-  {"de":"email","id":"email"},
   {"de":"engel","id":"malaikat"},
   {"de":"erden","id":"bumi"},
   {"de":"essen","id":"makan"},
@@ -43,7 +42,7 @@
   {"de":"motel","id":"motel"},
   {"de":"musik","id":"musik"},
   {"de":"nacht","id":"malam"},
-  {"de":"natür","id":"alami"},
+  {"de":"natur","id":"alami"},
   {"de":"nebel","id":"kabut"},
   {"de":"panda","id":"panda"},
   {"de":"pfeil","id":"panah"},
@@ -98,6 +97,5 @@
   {"de":"zaun","id":"pagar"},
   {"de":"zelle","id":"sel"},
   {"de":"zunge","id":"lidah"},
-  {"de":"zwei","id":"dua"},
   {"de":"zwirn","id":"benang"}
 ]
